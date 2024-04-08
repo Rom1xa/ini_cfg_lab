@@ -11,6 +11,7 @@ using KeysMap = std::map<std::string, std::string>;
 using SectionsMap = std::map<std::string, KeysMap>;
 
 const std::vector<std::string> trueValues = { "true", "yes", "y", "1" };
+const std::vector<std::string> falseValues = { "false", "no", "n", "0" };
 
 /// Класс для работы с файлами конфигурации формата .ini
 class IniFile 
