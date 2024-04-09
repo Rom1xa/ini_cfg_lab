@@ -7,28 +7,37 @@ IniFile::IniFile(const std::string& path) : filePath(path) {
 	ifstream file(filePath);
 
 	if (file.is_open()) {
-		string line;
+		string str;
 		string currentSection;
-		while (getline(file, line)) {
-			size_t kpos = line.find(';');
-			size_t ppos = line.find(']');
-			size_t tpos = line.find(' ');
-			if (line.empty() || line[0] == ';') {
+		while (getline(file, str)) {
+			string line = cleanupStr(str);
+
+			size_t lpos = line.find('[');
+			size_t rpos = line.find(']');
+			
+			if (line.empty()) {
 				continue;
 			}
-			// if (line[0] == '[' && line[line.size() - 1] == ']') {
-			// 	currentSection = line.substr(1, line.size() - 2);
-			// }
-			if (line[0] == '[') {
-				currentSection = line.substr(1, ppos - 1);
+			if (lpos != string::npos && lpos != line.rfind('[')) {
+				currentSection = "";
+				continue;
 			}
-			size_t pos = line.find('=');
-			if (pos != string::npos) {
-				string key = line.substr(0, pos);
-				string value = "";
-				string temp = line.substr(pos + 1, kpos - pos - 1);
-				for(char c : temp) if (c != ' ') value += c;
+			if (rpos != string::npos && rpos != line.rfind(']')) {
+				currentSection = "";
+				continue;
+			}
 
+			if (lpos != string::npos) {
+				currentSection = line.substr(1, line.length() - 2);
+			}
+			if (currentSection.empty()) {
+				continue;
+			}
+
+			size_t pos = line.find('=');
+			if (pos != string::npos && (pos == line.rfind('='))) {
+				string key = line.substr(0, pos);
+				string value = line.substr(pos + 1);
 				data[currentSection][key] = value;
 			} else {
 				data[currentSection] = KeysMap();
@@ -40,6 +49,20 @@ IniFile::IniFile(const std::string& path) : filePath(path) {
 
 IniFile::~IniFile() {
 	save();
+}
+
+std::string IniFile::cleanupStr(std::string str) {
+	string temp = "";
+
+	for (char c : str) {
+		if (c == ';') {
+			return temp;
+		}
+		if (c != ' ') {
+			temp += c;
+		}
+	}
+	return temp;
 }
 
 void IniFile::save() {

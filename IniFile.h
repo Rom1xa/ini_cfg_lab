@@ -71,6 +71,8 @@ public:
     /// Добавление новой секции
     bool addNewSection(const std::string& section);
 
+    std::string cleanupStr(std::string str);
+
 private:
     const std::string filePath;     ///< Путь до файла конфигурации
     SectionsMap data;               ///< Значения
