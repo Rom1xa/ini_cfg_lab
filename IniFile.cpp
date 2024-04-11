@@ -19,11 +19,14 @@ IniFile::IniFile(const std::string& path) : filePath(path) {
 				continue;
 			}
 			if (lpos != string::npos && lpos != line.rfind('[')) {
-				currentSection = "";
+				// currentSection = "";
 				continue;
 			}
 			if (rpos != string::npos && rpos != line.rfind(']')) {
-				currentSection = "";
+				// currentSection = "";
+				continue;
+			}
+			if (lpos != string::npos && rpos == string::npos) {
 				continue;
 			}
 
@@ -38,10 +41,14 @@ IniFile::IniFile(const std::string& path) : filePath(path) {
 			if (pos != string::npos && (pos == line.rfind('='))) {
 				string key = line.substr(0, pos);
 				string value = line.substr(pos + 1);
+				if (key.empty() || value.empty()) {
+					continue;
+				}
 				data[currentSection][key] = value;
-			} else {
-				data[currentSection] = KeysMap();
-			}
+			} 
+			// else {
+			// 	data[currentSection] = KeysMap();
+			// }
 		}
 		file.close();
 	}
@@ -190,7 +197,7 @@ bool IniFile::isKeysExist(const std::string& section, const std::string& key) {
 size_t IniFile::getSectionsCount() {
 	size_t res = 0;
 	for (const auto& section : data) {
-		if (!section.first.empty()) {
+		if (!section.second.empty()) {
 			res++;
 		}
 	}
@@ -211,6 +218,10 @@ bool IniFile::deleteSection(const std::string& section) {
 }
 
 bool IniFile::deleteKey(const std::string& section, const std::string& key) {
+	// if (data[section].size() == 1) {
+	// 	deleteSection(section);
+	// 	return true;
+	// }
 	return data[section].erase(key);
 }
 
