@@ -365,3 +365,5 @@ a.out
 *.a
 *.ini
 test
+.vscode
+test.ini.new
