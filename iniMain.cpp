@@ -1,10 +1,18 @@
-#include "IniFile.h"
+// #include "IniFile.h"
+#include <string>
+#include <iostream>
+
+
 using namespace std;
+
+void cleanupStr(std::string& str) {
+	size_t end = str.find(';');
+	if (end != string::npos) {
+		str = str.substr(0, end);
+	}
+}
 int main() {
-    IniFile ini("config.ini");
-    bool fs = ini.readBool("Window", "fullscreen", false);
-    ini.writeInt("Window", "UIScale",3);
-    int uiScale = ini.readInt("Window", "UIScale", 1);
-    cout << fs << endl;
-    return 0;
+    string str = "new rome asdfasdf";
+    cleanupStr(str);
+    cout << str << endl;
 }

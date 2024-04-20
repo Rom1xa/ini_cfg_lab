@@ -1,4 +1,5 @@
 #include "IniFile.h"
+#include <algorithm>
 #include <stdexcept>
 
 using namespace std;
@@ -7,10 +8,10 @@ IniFile::IniFile(const std::string& path) : filePath(path) {
 	ifstream file(filePath);
 
 	if (file.is_open()) {
-		string str;
+		string line;
 		string currentSection;
-		while (getline(file, str)) {
-			string line = cleanupStr(str);
+		while (getline(file, line)) {
+			cleanupStr(line);
 
 			size_t lpos = line.find('[');
 			size_t rpos = line.find(']');
@@ -44,11 +45,10 @@ IniFile::IniFile(const std::string& path) : filePath(path) {
 				if (key.empty() || value.empty()) {
 					continue;
 				}
+				cleanupStr(key);
+				cleanupStr(value);
 				data[currentSection][key] = value;
 			} 
-			// else {
-			// 	data[currentSection] = KeysMap();
-			// }
 		}
 		file.close();
 	}
@@ -58,18 +58,20 @@ IniFile::~IniFile() {
 	save();
 }
 
-std::string IniFile::cleanupStr(std::string str) {
-	string temp = "";
-
-	for (char c : str) {
-		if (c == ';') {
-			return temp;
-		}
-		if (c != ' ') {
-			temp += c;
-		}
+void IniFile::cleanupStr(std::string& str) {
+	size_t kom = str.find(';');
+	if (kom != string::npos) {
+		str = str.substr(0, kom);
 	}
-	return temp;
+
+	size_t start = str.find_first_not_of(' ');
+	size_t end = str.find_last_not_of(' ');
+
+	if (start == string::npos || end == string::npos) {
+		str.clear();
+	} else {
+		str = str.substr(start, end - start + 1);
+	}
 }
 
 void IniFile::save() {
