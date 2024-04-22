@@ -11,6 +11,7 @@ IniFile::IniFile(const std::string& path) : filePath(path) {
 		string line;
 		string currentSection;
 		while (getline(file, line)) {
+
 			cleanupStr(line);
 
 			size_t lpos = line.find('[');
@@ -20,18 +21,16 @@ IniFile::IniFile(const std::string& path) : filePath(path) {
 				continue;
 			}
 			if (lpos != string::npos && lpos != line.rfind('[')) {
-				// currentSection = "";
 				continue;
 			}
 			if (rpos != string::npos && rpos != line.rfind(']')) {
-				// currentSection = "";
 				continue;
 			}
 			if (lpos != string::npos && rpos == string::npos) {
 				continue;
 			}
 
-			if (lpos != string::npos) {
+			if (lpos != string::npos && rpos != string::npos) {
 				currentSection = line.substr(1, line.length() - 2);
 			}
 			if (currentSection.empty()) {
@@ -39,14 +38,19 @@ IniFile::IniFile(const std::string& path) : filePath(path) {
 			}
 
 			size_t pos = line.find('=');
+
 			if (pos != string::npos && (pos == line.rfind('='))) {
-				string key = line.substr(0, pos);
+
+				string key = line.substr(0, pos); 
 				string value = line.substr(pos + 1);
+
+				cleanupStr(key);
+				cleanupStr(value);
+
 				if (key.empty() || value.empty()) {
 					continue;
 				}
-				cleanupStr(key);
-				cleanupStr(value);
+
 				data[currentSection][key] = value;
 			} 
 		}
@@ -93,12 +97,6 @@ void IniFile::save() {
 
 int IniFile::readInt(const std::string& section, const std::string& key, int def) {
 
-	// if (!isSectionExist(section)) {
-	// 	addNewSection(section);
-	// }
-	// if (!isKeysExist(section, key)) {
-	// 	writeInt(section, key, def);
-	// }
 	if (isKeysExist(section, key)) {
 		return stoi(data[section][key]);
 	}
@@ -107,12 +105,7 @@ int IniFile::readInt(const std::string& section, const std::string& key, int def
 }
 
 double IniFile::readDouble(const std::string& section, const std::string& key, double def) {
-	// if (!isSectionExist(section)) {
-	// 	addNewSection(section);
-	// }
-	// if (!isKeysExist(section, key)) {
-	// 	writeDouble(section, key, def);
-	// }
+
 	if (isKeysExist(section, key)) {
 		return stod(data[section][key]);
 	}
@@ -120,12 +113,7 @@ double IniFile::readDouble(const std::string& section, const std::string& key, d
 }
 
 std::string IniFile::readString(const std::string& section, const std::string& key, const std::string& def) {
-	// if (!isSectionExist(section)) {
-	// 	addNewSection(section);
-	// }
-	// if (!isKeysExist(section, key)) {
-	// 	writeString(section, key, def);
-	// }
+
 	if (isKeysExist(section, key)) {
 		return data[section][key];
 	}
@@ -133,12 +121,7 @@ std::string IniFile::readString(const std::string& section, const std::string& k
 }
 
 bool IniFile::readBool(const std::string& section, const std::string& key, bool def) {
-	// if (!isSectionExist(section)) {
-	// 	addNewSection(section);
-	// }
-	// if (!isKeysExist(section, key)) {
-	// 	writeBool(section, key, def);
-	// }
+
 	if (isKeysExist(section, key)) {
 		for (auto& value : trueValues) {
 			if (data[section][key] == value) {
@@ -151,35 +134,23 @@ bool IniFile::readBool(const std::string& section, const std::string& key, bool 
 			}
 		}
 	}
-	//throw std::invalid_argument("invalid bool argument");
+
 	return def;
 }	
 
 void IniFile::writeInt(const std::string& section, const std::string& key, int value) {
-	// if (!isSectionExist(section)) {
-	// 	addNewSection(section);
-	// }
 	data[section][key] = to_string(value);
 }
 
 void IniFile::writeDouble(const std::string& section, const std::string& key, double value) {
-	// if (!isSectionExist(section)) {
-	// 	addNewSection(section);
-	// }
 	data[section][key] = to_string(value);
 }
 
 void IniFile::writeString(const std::string& section, const std::string& key, const std::string& value) {
-	// if (!isSectionExist(section)) {
-	// 	addNewSection(section);
-	// }
 	data[section][key] = value;
 }
 
 void IniFile::writeBool(const std::string& section, const std::string& key, bool value) {
-	// if (!isSectionExist(section)) {
-	// 	addNewSection(section);
-	// }
 	if (value) {
 		data[section][key] = "true";
 	} else {
@@ -192,7 +163,6 @@ bool IniFile::isSectionExist(const std::string& section) {
 }
 
 bool IniFile::isKeysExist(const std::string& section, const std::string& key) {
-	// data.count(section) && 
 	return data[section].count(key);
 }
 
@@ -204,7 +174,6 @@ size_t IniFile::getSectionsCount() {
 		}
 	}
 	return res;
-	// return data.size();
 }
 
 size_t IniFile::getKeysCount(const std::string& section) {
@@ -220,10 +189,6 @@ bool IniFile::deleteSection(const std::string& section) {
 }
 
 bool IniFile::deleteKey(const std::string& section, const std::string& key) {
-	// if (data[section].size() == 1) {
-	// 	deleteSection(section);
-	// 	return true;
-	// }
 	return data[section].erase(key);
 }
 

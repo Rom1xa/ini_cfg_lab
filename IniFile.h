@@ -6,11 +6,11 @@
 #include <fstream>
 #include <iostream>
 
-using KeysMap = std::map<std::string, std::string>;
+using KeysMap = std::map<std::string, std::string>;  
 using SectionsMap = std::map<std::string, KeysMap>;
 
 const std::vector<std::string> trueValues = { "true", "yes", "y", "1" };
-const std::vector<std::string> falseValues = { "false", "no", "n", "0" };
+const std::vector<std::string> falseValues = { "false", "no", "n", "0" }; // это я добавил
 
 /// Класс для работы с файлами конфигурации формата .ini
 class IniFile 
@@ -70,7 +70,7 @@ public:
     /// Добавление новой секции
     bool addNewSection(const std::string& section);
 
-    void cleanupStr(std::string& str);
+    void cleanupStr(std::string& str); // это я добавил
 
 private:
     const std::string filePath;     ///< Путь до файла конфигурации
